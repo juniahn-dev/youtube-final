@@ -1,8 +1,9 @@
-import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
+import { Route, useLocation } from "react-router-dom";
 import { render, screen } from "@testing-library/react";
 
 import VideoCard from "../VideoCard";
 import { formatAgo } from "../../util/date";
+import renderer from "react-test-renderer";
 import userEvent from "@testing-library/user-event";
 import { fakeVideo as video } from "../../test/videos";
 import { withRouter } from "../../test/utils";
@@ -10,6 +11,25 @@ import { withRouter } from "../../test/utils";
 describe("VideoCard", () => {
   const { title, channelTitle, publishedAt, thumbnails } = video.snippet;
 
+  // snapshot을 이용한 정적인 test
+  it("renders grid type correctly", () => {
+    const component = renderer.create(
+      withRouter(<Route path="/" element={<VideoCard video={video} />} />)
+    );
+
+    expect(component.toJSON()).toMatchSnapshot();
+  });
+  it("renders list type correctly", () => {
+    const component = renderer.create(
+      withRouter(
+        <Route path="/" element={<VideoCard video={video} type="list" />} />
+      )
+    );
+
+    expect(component.toJSON()).toMatchSnapshot();
+  });
+
+  // snapshot이 아닌 정적인 test
   it("renders video item", () => {
     render(
       withRouter(<Route path="/" element={<VideoCard video={video} />} />)
