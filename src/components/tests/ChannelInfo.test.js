@@ -13,7 +13,30 @@ describe("ChannelInfo", () => {
 
   it("renders correctly", async () => {
     fakeYoutube.channelImageURL.mockImplementation(() => "url");
-    render(
+    const { asFragment } = renderChannelInfo();
+
+    await waitFor(() => screen.findByRole("img"));
+    expect(asFragment()).toMatchSnapshot();
+  });
+
+  it("rendres without URL", () => {
+    fakeYoutube.channelImageURL.mockImplementation(() => {
+      throw new Error("error");
+    });
+    renderChannelInfo();
+
+    expect(screen.queryByRole("img")).toBeNull();
+  });
+
+  it("renders with URL", async () => {
+    fakeYoutube.channelImageURL.mockImplementation(() => "url");
+    renderChannelInfo();
+
+    await screen.findByRole("img");
+  });
+
+  function renderChannelInfo() {
+    return render(
       withAllContexts(
         withRouter(
           <Route path="/" element={<ChannelInfo id="id" name="channel" />} />
@@ -21,7 +44,5 @@ describe("ChannelInfo", () => {
         fakeYoutube
       )
     );
-
-    await waitFor(() => screen.findByText("channel"));
-  });
+  }
 });
